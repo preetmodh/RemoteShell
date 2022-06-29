@@ -3,64 +3,55 @@ import os
 import sys
 import time
 
+from numpy import choose
+
 
 sock = socket.socket()
-host = ''
+host = '192.168.112.248'
 port = 9999
 
 sock.connect((host, port))
 
-def main():
-    pass
 
-def choose_option():
-    print("Welcom to Remote shell")
-    input("What would to you like to do: ")
-    print("1. Send command")
-    print("2. Send file")
-    print("3. Receive file")
-    print("4. Exit")
-    option = input("Enter option: ")
-    if option == '1':
-        send_command()
-    elif option == '2':
-        send_file()
-    elif option == '3':
-        receive_file()
-    elif option == '4':
+def choose_option(client_currentWD):
+    shell_name="<"+host+"> " + client_currentWD
+    command = input(shell_name)
+
+
+    if "send" in ''.join(command[:5]):
+        send_file(command)
+    elif "receive" in ''.join(command[:9]):
+        receive_file(command)
+    elif "exit" in ''.join(command[:5]):
         sock.close()
         sys.exit()
     else:
-        print("Invalid option")
-        choose_option()
+        client_currentWD=send_command(command)
+    choose_option(client_currentWD)
+    
 
 
 #send command to server
-def send_command():
-    while(True):
-        print("Enter back to go back")
-        command = input("Enter command: ")
-        if command == 'back':
-            choose_option()
-        else:
-            if len(str.encode(command))>0:
-                #send the command
-                sock.send(str.encode(command))
-                #receive the response
-                server_response = str(sock.recv(1024), 'utf-8')
-
-                print(server_response, end="")
+def send_command(command):
+    if len(str.encode(command))>0:
+            #send the command
+            sock.send(str.encode(command))
+            #receive the response
+            server_response = str(sock.recv(2147483647//2), 'utf-8')
+            client_currentWD = server_response[:server_response.find("> ")+2]
+            output_response = server_response[server_response.find("> ")+2:]
+            print(output_response, end="")
+    return client_currentWD
 
 #send file to server
-def send_file():
-    print("Enter back to go back")
+def send_file(command):
     # Getting file details.
     file_name = input("File to send:")
     if os.path.isfile(file_name):
     
         file_size = os.path.getsize(file_name)
         sock.send(str.encode(file_name))
-        sock.send(str.encode(str.format(file_size)))
+        sock.send(str.encode(str(file_size)))
         # Opening file and sending data.
         with open(file_name, "rb") as file:
             c = 0
@@ -82,12 +73,12 @@ def send_file():
         print("File Transfer Complete . Total time to transfer: ", end_time - start_time)
     else:
         print ("File not exist")
+    return None
 
 
 
 #receive file from server
-def receive_file():
-    print("Enter back to go back")
+def receive_file(command):
     # Getting file details.
     file_name = input("File to receive:")
     file_size = int(sock.recv(1024))
@@ -110,7 +101,13 @@ def receive_file():
         end_time = time.time()
 
     print("File received .Total time: ", end_time - start_time)
+    return None
 
 
 
+def main():
+    print("Welcome to " + host + "'s " + "shell")
+    client_currentWD = str(sock.recv(1024), 'utf-8')
+    choose_option(client_currentWD)
 
+main()
