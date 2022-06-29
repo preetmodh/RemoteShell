@@ -1,8 +1,6 @@
 import socket
 import sys
 
-
-
 #create a socket
 def create_socket():
     try:
@@ -32,7 +30,7 @@ def bind_socket():
         print("Error binding the port: " + str(error_messsage) + "\n" + "Retrying...")
         bind_socket() #call the function again to try binding again
 
-#accept a connection with a client when socket is listening
+#accept a connection with a server when socket is listening
 def accept_connection():
     connection, address = s.accept()
     print("Connection has been established! | " + "IP " + address[0] + " | Port " + str(address[1]))
