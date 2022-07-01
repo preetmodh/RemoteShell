@@ -54,7 +54,7 @@ def check_commands(connection):
         elif "receive" in ''.join(data[:9]).lower():
             send_file_to_client(data,connection)
         else:
-            client_currentWD=execute_command(data,connection)
+            execute_command(data,connection)
 
 
 
@@ -79,7 +79,7 @@ def execute_command(command,connection):
 #send file to client that is asked to received
 def send_file_to_client(command,connection):
     file_info_list = command.strip(' ') # remove trailing spaces
-    file_info_list = list(map(int,input().split()))
+    file_info_list = list(map(str,file_info_list.split()))
     file_path = file_info_list[1] # 0th element is the command, 1st element is the file path
     if os.path.isfile(file_path):
         
@@ -103,7 +103,7 @@ def send_file_to_client(command,connection):
             # Ending the time capture.
             end_time = time.time()
 
-        print("File succesfully sended to client . Total time to transfer: ", end_time - start_time)
+        print("File succesfully sended to client. Total time to transfer: ", end_time - start_time)
     else:
         print ("File path does not exist")
         connection.send(str.encode("File path does not exist on server"))
@@ -114,21 +114,23 @@ def send_file_to_client(command,connection):
 #receive file from client
 def receive_file_from_client(command,connection):
     file_info_list = command.strip(' ') # remove trailing spaces
-    file_info_list = list(map(int,input().split()))
+    file_info_list = list(map(str,file_info_list.split()))
     file_name = file_info_list[2] or "temp" # 0th element is the command, 2nd element is the file name
-    file_path = file_info_list[1] # 1st element is  the file  path 
+    file_path = "./res/" + file_name
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
     # Getting file details.
-
-    file_size = int(connection.recv(1024))
-
+    file_size = connection.recv(100).decode()
+    
     # Opening and reading file.
-    with open("./recs/" + file_name, "wb") as file:
+    with open( file_path, "wb") as file:
         c = 0
         # Starting the time capture.
-        start_time = time.time()
         print("Receiving file...")
+        start_time = time.time()
+
         # Running the loop while file is recieved.
-        while c <= int(file_size):
+        while c < int(file_size):
             data = connection.recv(1024)
             if not (data):
                 break
@@ -137,8 +139,9 @@ def receive_file_from_client(command,connection):
 
         # Ending the time capture.
         end_time = time.time()
+    
 
-    print("File received from client .Total time: ", end_time - start_time)
+    print("File received from client. Total time: ", end_time - start_time)
     return None
 
 
