@@ -50,7 +50,7 @@ def send_file_to_server(command):
     file_info_list = command.strip(' ') # remove trailing spaces
     file_info_list = list(map(str,file_info_list.split()))
     file_path = file_info_list[1] # 0th element is the command, 1st element is the file path
-    
+
     if os.path.isfile(file_path):
         
         file_size = os.path.getsize(file_path)
@@ -96,7 +96,9 @@ def receive_file_from_server(command):
 
     # Getting file details.
     file_size = sock.recv(100).decode()
-
+    if file_size == "0":
+        print("File does not exist on server.")
+        return None
     # Opening and reading file.
     with open(file_path, "wb") as file:
         c = 0
@@ -106,9 +108,6 @@ def receive_file_from_server(command):
         # Running the loop while file is recieved.
         while c < int(file_size):
             data = sock.recv(1024)
-            if data.decode('utf-8')=="File path does not exist on server":
-                print("File path does not exist on server")
-                return None
             if not (data):
                 break
             file.write(data)

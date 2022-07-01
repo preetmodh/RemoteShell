@@ -106,7 +106,7 @@ def send_file_to_client(command,connection):
         print("File succesfully sended to client. Total time to transfer: ", end_time - start_time)
     else:
         print ("File path does not exist")
-        connection.send(str.encode("File path does not exist on server"))
+        connection.send(str.encode("0"))
     return None
 
 
