@@ -19,9 +19,9 @@ def choose_command(client_currentWD):
 
 
     if "send" in ''.join(command[:5]).lower():
-        send_file(command)
+        send_file_to_server(command)
     elif "receive" in ''.join(command[:9]).lower():
-        receive_file(command)
+        receive_file_from_server(command)
     elif "exit" in ''.join(command[:5]).lower():
         sock.close()
         sys.exit()
@@ -44,10 +44,13 @@ def send_command(command):
     return client_currentWD
 
 #send file to server
-def send_file(command):
+#send "source_filepath" "filename"
+def send_file_to_server(command):
     file_info_list = command.strip(' ') # remove trailing spaces
     file_info_list = list(map(int,input().split()))
     file_path = file_info_list[1] # 0th element is the command, 1st element is the file path
+    file_name = file_info_list[2] # 2nd element is  the file  name
+
     if os.path.isfile(file_path):
         
         file_size = os.path.getsize(file_path)
@@ -78,13 +81,13 @@ def send_file(command):
 
 
 #receive file from server
-def receive_file(command):
+# receive "filepath from server" "filename"
+def receive_file_from_server(command):
     file_info_list = command.strip(' ') # remove trailing spaces
     file_info_list = list(map(int,input().split()))
     file_name = file_info_list[2] # 0th element is the command, 2nd element is the file name
     file_path = file_info_list[1] # 1st element is  the file  path 
     # Getting file details.
-    sock.send(str.encode(str(file_path)))
     file_size = int(sock.recv(1024))
 
     # Opening and reading file.
@@ -96,6 +99,9 @@ def receive_file(command):
         # Running the loop while file is recieved.
         while c <= int(file_size):
             data = sock.recv(1024)
+            if data.decode('utf-8')=="File path does not exist on server":
+                print("File path does not exist on server")
+                return None
             if not (data):
                 break
             file.write(data)
