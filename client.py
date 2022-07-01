@@ -13,21 +13,21 @@ port = 9999
 sock.connect((host, port))
 
 
-def choose_option(client_currentWD):
+def choose_command(client_currentWD):
     shell_name="<"+host+"> " + client_currentWD
     command = input(shell_name)
 
 
-    if "send" in ''.join(command[:5]):
+    if "send" in ''.join(command[:5]).lower():
         send_file(command)
-    elif "receive" in ''.join(command[:9]):
+    elif "receive" in ''.join(command[:9]).lower():
         receive_file(command)
-    elif "exit" in ''.join(command[:5]):
+    elif "exit" in ''.join(command[:5]).lower():
         sock.close()
         sys.exit()
     else:
         client_currentWD=send_command(command)
-    choose_option(client_currentWD)
+    choose_command(client_currentWD)
     
 
 
@@ -45,15 +45,15 @@ def send_command(command):
 
 #send file to server
 def send_file(command):
-    # Getting file details.
-    file_name = input("File to send:")
-    if os.path.isfile(file_name):
-    
-        file_size = os.path.getsize(file_name)
-        sock.send(str.encode(file_name))
+    file_info_list = command.strip(' ') # remove trailing spaces
+    file_info_list = list(map(int,input().split()))
+    file_path = file_info_list[1] # 0th element is the command, 1st element is the file path
+    if os.path.isfile(file_path):
+        
+        file_size = os.path.getsize(file_path)
         sock.send(str.encode(str(file_size)))
         # Opening file and sending data.
-        with open(file_name, "rb") as file:
+        with open(file_path, "rb") as file:
             c = 0
             # Starting the time capture.
             start_time = time.time()
@@ -72,15 +72,19 @@ def send_file(command):
 
         print("File Transfer Complete . Total time to transfer: ", end_time - start_time)
     else:
-        print ("File not exist")
+        print ("File path does not exist")
     return None
 
 
 
 #receive file from server
 def receive_file(command):
+    file_info_list = command.strip(' ') # remove trailing spaces
+    file_info_list = list(map(int,input().split()))
+    file_name = file_info_list[2] # 0th element is the command, 2nd element is the file name
+    file_path = file_info_list[1] # 1st element is  the file  path 
     # Getting file details.
-    file_name = input("File to receive:")
+    sock.send(str.encode(str(file_path)))
     file_size = int(sock.recv(1024))
 
     # Opening and reading file.
@@ -108,6 +112,6 @@ def receive_file(command):
 def main():
     print("Welcome to " + host + "'s " + "shell")
     client_currentWD = str(sock.recv(1024), 'utf-8')
-    choose_option(client_currentWD)
+    choose_command(client_currentWD)
 
 main()
