@@ -7,7 +7,7 @@ from numpy import choose
 
 
 sock = socket.socket()
-host = '192.168.164.248'
+host = '172.23.104.62'
 port = 9999
 
 sock.connect((host, port))

