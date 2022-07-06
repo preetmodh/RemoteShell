@@ -43,4 +43,4 @@ You can enter `list` in the shell to list out all the commands ,which are:
 After connecting you can iteract with the server or target machines command line in any way you want using the command-line commands
 
 # Disclaimer: 
-This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal. 
+Accessing a computer network without authorization or permission is illegal. 
