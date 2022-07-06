@@ -40,7 +40,7 @@ You can enter `list` in the shell to list out all the commands ,which are:
 * **`help`** - list commandline options 
 * **`exit`** - exit the shell
 
-After connecting you can iteract with the server or target machines command line in any way you want using the command-line commands
+After connecting you can iteract with the server or target machine's command line in any way you want using the command-line commands
 
 # Disclaimer: 
 Accessing a computer network without authorization or permission is illegal. 
