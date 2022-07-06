@@ -7,7 +7,8 @@ import time
 
 
 sock = socket.socket()
-host = '172.23.104.62'
+#host = '192.168.158.248'
+host = '172.17.209.69'
 port = 9999
 
 sock.connect((host, port))
@@ -22,14 +23,24 @@ def choose_command(client_currentWD):
         send_file_to_server(command)
     elif "receive" in ''.join(command[:9]).lower():
         receive_file_from_server(command)
+    elif "sysinfo" in ''.join(command[:9]).lower():
+        get_syteminfo_from_server(command)
     elif "exit" in ''.join(command[:5]).lower():
+        sock.send(str.encode("exit"))
         sock.close()
         sys.exit()
+
     else:
         client_currentWD=send_command(command,client_currentWD)
     choose_command(client_currentWD)
     
-
+#get system info from server
+def get_syteminfo_from_server(command):
+    sock.send(str.encode(command))
+    print("receiving system info....")
+    server_response = str(sock.recv(2147483647), 'utf-8')
+    print(server_response)
+    return None
 
 #send command to server
 def send_command(command,client_currentWD):
@@ -126,4 +137,6 @@ def main():
     client_currentWD = str(sock.recv(1024), 'utf-8')
     choose_command(client_currentWD)
 
-main()
+
+if __name__ == '__main__':
+    main()
