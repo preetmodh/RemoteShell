@@ -110,7 +110,10 @@ def receive_file_from_server(command):
     sock.send(str.encode(command))
     file_info_list = command.strip(' ') # remove trailing spaces
     file_info_list = list(map(str,file_info_list.split()))
-    file_name = file_info_list[2] # 0th element is the command, 2nd element is the file name
+    if len(file_info_list) == 2:
+        file_name="temp_file.txt"
+    else:
+        file_name = file_info_list[2] # 0th element is the command, 2nd element is the file name
     file_path = "./rec/" + file_name
     os.makedirs(os.path.dirname(file_path), exist_ok=True) 
 
