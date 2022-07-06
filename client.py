@@ -15,7 +15,7 @@ sock.connect((host, port))
 
 
 def choose_command(client_currentWD):
-    shell_name="<"+host+"> " + client_currentWD
+    shell_name="\n"+"<"+host+"> " + client_currentWD
     command = input(shell_name)
 
 
@@ -29,11 +29,21 @@ def choose_command(client_currentWD):
         sock.send(str.encode("exit"))
         sock.close()
         sys.exit()
+    elif "list" in ''.join(command[:5]).lower():
+        list_commands()
 
     else:
         client_currentWD=send_command(command,client_currentWD)
     choose_command(client_currentWD)
-    
+
+#list commands
+def list_commands():
+    print("-send <filepath> <filename>: send file to server")
+    print("-receive <filepath> <filename>: receive file from server")
+    print("-sysinfo: get system info from server")
+    print("-help: list commandline options")
+    print("-exit: exit the shell")
+    return None
 #get system info from server
 def get_syteminfo_from_server(command):
     sock.send(str.encode(command))
@@ -133,7 +143,7 @@ def receive_file_from_server(command):
 
 
 def main():
-    print("Welcome to " + host + "'s " + "shell")
+    print("Welcome to " + host + "'s " + "shell"+ "(enter list to list commands)")
     client_currentWD = str(sock.recv(1024), 'utf-8')
     choose_command(client_currentWD)
 
