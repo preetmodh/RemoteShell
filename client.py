@@ -1,3 +1,4 @@
+#importing required modules
 import socket
 import os
 import sys
@@ -7,8 +8,7 @@ import time
 
 
 sock = socket.socket()
-#host = '192.168.158.248'
-host = '172.17.209.69'
+host = '192.168.158.248'
 port = 9999
 
 sock.connect((host, port))

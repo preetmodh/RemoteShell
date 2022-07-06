@@ -1,3 +1,4 @@
+#importing required modules
 import socket
 import sys
 import subprocess
@@ -47,7 +48,6 @@ def accept_connection():
     #do something with the connection
     check_commands(connection)
     
-
 #execute commands sent by the server
 def check_commands(connection):
     while(True):
@@ -66,8 +66,6 @@ def check_commands(connection):
             break
         else:
             execute_command(data,connection)
-
-
 
 # send system information to client
 def send_syteminfo_from_server(command,connection):
@@ -183,8 +181,6 @@ def send_syteminfo_from_server(command,connection):
 
     connection.send(str.encode(info))
     return None
-
-
 
 #execute command received by the client
 def execute_command(command,connection):
