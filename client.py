@@ -36,6 +36,7 @@ def choose_command(client_currentWD):
         client_currentWD=send_command(command,client_currentWD)
     choose_command(client_currentWD)
 
+
 #list commands
 def list_commands():
     print("-send <filepath> <filename>: send file to server")
@@ -44,6 +45,8 @@ def list_commands():
     print("-help: list commandline options")
     print("-exit: exit the shell")
     return None
+
+
 #get system info from server
 def get_syteminfo_from_server(command):
     sock.send(str.encode(command))
@@ -51,6 +54,7 @@ def get_syteminfo_from_server(command):
     server_response = str(sock.recv(2147483647), 'utf-8')
     print(server_response)
     return None
+
 
 #send command to server
 def send_command(command,client_currentWD):
@@ -63,6 +67,7 @@ def send_command(command,client_currentWD):
             output_response = server_response[server_response.find("> ")+2:]
             print(output_response, end="")
     return client_currentWD
+
 
 #send file to server
 #send "source_filepath" "filename"
