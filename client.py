@@ -8,7 +8,7 @@ import time
 
 
 sock = socket.socket()
-host = '192.168.158.248'
+host = '0.0.0.0'
 port = 9999
 
 sock.connect((host, port))
@@ -76,7 +76,7 @@ def send_file_to_server(command):
         
         file_size = os.path.getsize(file_path)
         sock.send(str.encode(str(file_size)))
-
+        time.sleep(0.3)
 
         # Opening file and sending data.
         with open(file_path, "rb") as file:
@@ -95,7 +95,6 @@ def send_file_to_server(command):
             # Ending the time capture.
             end_time = time.time()
 
-        sock.send(str.encode(str('')))
 
         print("File Transfer Complete. Total time to transfer: ", end_time - start_time)
     else:
@@ -120,6 +119,7 @@ def receive_file_from_server(command):
 
     # Getting file details.
     file_size = sock.recv(100).decode()
+
     if file_size == "0":
         print("File does not exist on server.")
         return None
@@ -132,8 +132,6 @@ def receive_file_from_server(command):
         # Running the loop while file is recieved.
         while c < int(file_size):
             data = sock.recv(1024)
-            if not (data):
-                break
             file.write(data)
             c += len(data)
 

@@ -11,6 +11,8 @@ import cpuinfo
 import socket
 import threading
 from multiprocessing import Pool
+# pip install psutil
+# pip install py-cpuinfo
 
 #create a socket
 def create_socket():
@@ -232,6 +234,8 @@ def send_file_to_client(command,connection):
         
         file_size = os.path.getsize(file_path)
         connection.send(str.encode(str(file_size)))
+        time.sleep(0.3)
+        
         # Opening file and sending data.
         with open(file_path, "rb") as file:
             c = 0
@@ -282,8 +286,6 @@ def receive_file_from_client(command,connection):
         # Running the loop while file is recieved.
         while c < int(file_size):
             data = connection.recv(1024)
-            if not (data):
-                break
             file.write(data)
             c += len(data)
 
